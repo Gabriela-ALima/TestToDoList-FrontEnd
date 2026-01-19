@@ -1,73 +1,76 @@
-# React + TypeScript + Vite
+# 📝 Task Manager Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este é o frontend da aplicação **Task Manager**, um ecossistema completo para organização de atividades. O projeto oferece uma experiência de usuário (UX) fluida, com fluxos de autenticação robustos e gerenciamento completo de dados (CRUD) via integração com API.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Fluxo e Páginas da Aplicação
 
-## React Compiler
+A aplicação está estruturada para guiar o usuário de forma intuitiva:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Página Inicial (Home)**: Landing page com apresentação do sistema e pontos de entrada para Login e Cadastro.
+* **Cadastro**: Interface para registro de novos usuários. Após o sucesso, redireciona para o Login.
+* **Login**: Autenticação segura que gera o token de acesso e redireciona o usuário para o painel de tarefas.
+* **Lista de Tarefas**: Visualização centralizada de todas as tarefas cadastradas.
+* **Editar Tarefas**: Área dedicada para atualização de títulos, descrições e status das atividades existentes.
+* **Editar Usuário/Perfil**: Funcionalidade para que o usuário autenticado atualize suas informações cadastrais.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠️ Tecnologias Utilizadas
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+* **React + TypeScript**: Desenvolvimento de componentes reutilizáveis e tipagem estática.
+* **Vite**: Ferramenta de build otimizada para performance em desenvolvimento.
+* **Tailwind CSS**: Estilização baseada em classes utilitárias para design responsivo.
+* **React Router Dom**: Gestão de rotas dinâmicas e proteção de navegação.
+* **Axios**: Cliente HTTP para consumo da API Backend (endpoints de usuários e tarefas).
+* **Context API**: Gerenciamento de estado global para persistência de tokens e dados do usuário logado.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## ⚙️ Como Executar o Projeto
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Siga os passos abaixo para rodar a aplicação localmente:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 1. Instalação
+Clone o repositório e instale as dependências:
+```bash
+# Clonar o repositório
+git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+# Entrar na pasta
+cd task-manager-frontend
+
+# Instalar dependências
+npm install
+
+2. Configuração de API
+Certifique-se de que o backend esteja acessível. No arquivo de serviços (src/services/Service.ts), verifique a URL base:
+
+TypeScript
+const api = axios.create({
+  baseURL: '[https://sua-api-backend.render.com](https://sua-api-backend.render.com)'
+});
+
+3. Execução
+Inicie o servidor de desenvolvimento:
+
+Bash
+npm run dev
+Acesse: http://localhost:5173
+
+📂 Estrutura de Pastas Principal
+src/pages/: Implementação das telas (Home, Login, Cadastro, Tarefas, Edição).
+
+src/components/: Componentes globais (Navbar, Footer, Botões Reutilizáveis).
+
+src/contexts/: Provedor de autenticação (AuthContext).
+
+src/models/: Interfaces TypeScript para tipagem de dados da API.
+
+src/services/: Configuração e chamadas de API via Axios.
+
+📄 Licença
+Este projeto está sob a licença MIT.
+
+Desenvolvido como parte do projeto de integração Fullstack.
