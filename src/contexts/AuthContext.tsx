@@ -17,7 +17,7 @@ export const AuthContext = createContext({} as AuthContextProps);
 
 export function AuthProvider({ children }: AuthProviderProps) {
   
-  // AJUSTE: O estado inicial agora busca no localStorage para evitar perda de ID no F5
+  
   const [usuario, setUsuario] = useState<LoginUsuario>(() => {
     const storage = localStorage.getItem('usuarioToken');
     if (storage) {
@@ -39,7 +39,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // Hook para garantir sincronização (opcional)
+  
   useEffect(() => {
     const storage = localStorage.getItem('usuarioToken');
     if (storage) {
@@ -54,16 +54,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(true);
 
     try {
-      // Chamada para o Service passando a rota de login
       await login(`/usuarios/logar/`, loginUsuario, (resposta: any) => {
         
-        // Verifique no Console (F12) se a 'resposta' do seu backend contém o campo 'id'
+      
         console.log("Login realizado. Dados recebidos:", resposta);
         
-        // Atualiza o estado global com os dados (incluindo ID e Token)
+        
         setUsuario(resposta);
         
-        // Salva no localStorage para persistência
+       
         localStorage.setItem('usuarioToken', JSON.stringify(resposta));
       });
       
@@ -82,7 +81,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   function handleLogout() {
-    // Limpa o estado e o armazenamento local
+    
     setUsuario({
       id: 0,
       name: "",

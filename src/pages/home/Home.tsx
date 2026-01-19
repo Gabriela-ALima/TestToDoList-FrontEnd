@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Home() {
   return (
     <>
@@ -8,15 +10,19 @@ function Home() {
             <p className="text-xl">Organize seu dia a dia com facilidade</p>
             
             <div className="flex justify-around gap-4">
-              {/* Botão de Login com o estilo original */}
-              <button className="rounded text-white border-white border-solid border-2 py-2 px-4">
-                Login
-              </button>
               
-              {/* Botão de Cadastro com o mesmo estilo */}
-              <button className="rounded text-white border-white border-solid border-2 py-2 px-4">
-                Cadastrar Usuário
-              </button>
+              <Link to="/login">
+                <button className="rounded text-white border-white border-solid border-2 py-2 px-4">
+                  Login
+                </button>
+              </Link>
+              
+              
+              <Link to="/cadastro">
+                <button className="rounded text-white border-white border-solid border-2 py-2 px-4">
+                  Cadastrar Usuário
+                </button>
+              </Link>
             </div>   
           </article>
           
