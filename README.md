@@ -1,6 +1,6 @@
-# 📝 Task Manager Frontend
+# 📝 Test To Do List Frontend
 
-Este é o frontend da aplicação **Task Manager**, um ecossistema completo para organização de atividades. O projeto oferece uma experiência de usuário (UX) fluida, com fluxos de autenticação robustos e gerenciamento completo de dados (CRUD) via integração com API.
+Este é o frontend da aplicação **Test To Do List**, um ecossistema completo para organização de atividades. O projeto oferece uma experiência de usuário (UX) fluida, com fluxos de autenticação robustos e gerenciamento completo de dados (CRUD) via integração com API.
 
 ---
 
