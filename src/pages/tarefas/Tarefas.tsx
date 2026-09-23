@@ -3,7 +3,7 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { buscar, atualizar, deletar, cadastrar } from "../../services/Service";
 import { AuthContext } from "../../contexts/AuthContext";
 import { ClipLoader } from "react-spinners";
-import Navbar from "../../components/navbar/Navbar";
+
 
 interface Tarefa {
   id?: number;
@@ -23,7 +23,7 @@ function Tarefas() {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
-  // ADICIONEI UM ITEM DE TESTE AQUI PARA OS BOTÕES APARECEREM NA TELA
+  
   const [listaTarefas, setListaTarefas] = useState<Tarefa[]>([
     { id: 999, titulo: "Tarefa de Exemplo", descricao: "Cadastre uma tarefa real para substituir esta." }
   ]);
@@ -33,7 +33,7 @@ function Tarefas() {
     descricao: "",
   });
 
-  // 1. BUSCAR TODAS (LISTAR)
+  
   useEffect(() => {
     if (isGerenciar && token !== "") {
       buscar("/tarefas", setListaTarefas, {
@@ -42,7 +42,7 @@ function Tarefas() {
     }
   }, [isGerenciar, token]);
 
-  // 2. BUSCAR UMA (PARA EDITAR)
+  
   useEffect(() => {
     if (isEdicao && token !== "") {
       buscar(`/tarefas/${id}`, setTarefa, {
@@ -55,21 +55,21 @@ function Tarefas() {
     setTarefa({ ...tarefa, [e.target.name]: e.target.value });
   }
 
-  // 3. LÓGICA DE CADASTRAR E ATUALIZAR
+  
   async function processarFormulario(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
 
     try {
       if (isEdicao) {
-        // FUNÇÃO ATUALIZAR
+        
         await atualizar(`/tarefas`, tarefa, setTarefa, {
           headers: { Authorization: token },
         });
         alert("Tarefa atualizada com sucesso!");
         navigate("/gerenciarTarefas");
       } else {
-        // FUNÇÃO CADASTRAR (VINCULADA AO USUÁRIO LOGADO)
+        
         const tarefaComUsuario = { ...tarefa, usuario: { id: usuarioLogado.id } };
         
         await cadastrar(`/tarefas`, tarefaComUsuario, setTarefa, {
@@ -90,7 +90,7 @@ function Tarefas() {
     }
   }
 
-  // 4. FUNÇÃO DELETAR
+  
   async function excluirTarefa(idTarefa: number) {
     if (window.confirm("Tem certeza que deseja excluir esta tarefa?")) {
       try {
@@ -107,21 +107,20 @@ function Tarefas() {
 
   return (
     <>
-      <Navbar />
-      {/* Container Principal seguindo o estilo do Cadastro (Grid 50/50) */}
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 h-screen place-items-center font-bold">
         
-        {/* Lado Esquerdo: Imagem Padrão */}
+        
         <div className="bg-[url('https://i.imgur.com/ZZFAmzo.jpg')] lg:block hidden bg-no-repeat w-full h-full bg-cover bg-center"></div>
 
-        {/* Lado Direito: Conteúdo Dinâmico */}
+        
         <div className="flex flex-col justify-center items-center w-full p-8">
           <h2 className="text-indigo-900 text-5xl mb-6 text-center">
             {isGerenciar ? "Gerenciar" : (isEdicao ? "Editar" : "Nova Tarefa")}
           </h2>
 
           {isGerenciar ? (
-            /* --- MODO GERENCIAR: LISTA DE TAREFAS --- */
+            
             <div className="w-full max-w-md flex flex-col gap-4">
               <button 
                 onClick={() => navigate("/tarefas")} 
@@ -137,14 +136,14 @@ function Tarefas() {
                     <p className="font-normal text-slate-600 text-sm mb-3">{t.descricao}</p>
                     
                     <div className="flex gap-2">
-                      {/* Rota de Atualizar */}
+                      
                       <button 
                         onClick={() => navigate(`/editarTarefa/${t.id}`)} 
                         className="flex-1 bg-teal-600 text-white rounded py-1 text-sm hover:bg-teal-700 transition font-bold"
                       >
                         Editar
                       </button>
-                      {/* Rota de Deletar */}
+                      
                       <button 
                         onClick={() => t.id && excluirTarefa(t.id)} 
                         className="flex-1 bg-red-600 text-white rounded py-1 text-sm hover:bg-red-700 transition font-bold"
@@ -158,7 +157,7 @@ function Tarefas() {
               <button onClick={() => navigate("/home")} className="text-slate-500 hover:underline mt-2">Voltar para Home</button>
             </div>
           ) : (
-            /* --- MODO FORMULÁRIO: CRIAR OU EDITAR --- */
+            
             <form onSubmit={processarFormulario} className="flex flex-col w-full max-w-md gap-4">
               <div className="flex flex-col w-full">
                 <label>Título da Tarefa</label>

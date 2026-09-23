@@ -10,14 +10,14 @@ function Login() {
 
     const { usuario, handleLogin, isLoading } = useContext(AuthContext);
 
-    // Trocado para LoginUsuario conforme solicitado
     const [loginUsuario, setLoginUsuario] = useState<LoginUsuario>(
         {} as LoginUsuario
     );
 
+    
     useEffect(() => {
         if (usuario.token !== "") {
-            navigate('/home');
+            navigate('/login'); 
         }
     }, [usuario, navigate]);
 
@@ -44,7 +44,7 @@ function Login() {
                         <input
                             type="text"
                             id="username"
-                            name="username" // Nome deve ser igual à propriedade do model
+                            name="username"
                             placeholder="Usuário"
                             className="border-2 border-slate-700 rounded p-2"
                             value={loginUsuario.username || ""}
@@ -57,7 +57,7 @@ function Login() {
                         <input
                             type="password"
                             id="password"
-                            name="password" // Nome deve ser igual à propriedade do model
+                            name="password"
                             placeholder="Senha"
                             className="border-2 border-slate-700 rounded p-2"
                             value={loginUsuario.password || ""}
