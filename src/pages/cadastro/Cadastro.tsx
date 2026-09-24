@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { cadastrarUsuario, atualizar, deletar } from "../../services/Service";
 import { AuthContext } from "../../contexts/AuthContext";
 import { ClipLoader } from "react-spinners";
-import Navbar from "../../components/navbar/Navbar";
 
 interface Usuario {
   id?: number;
@@ -18,7 +17,6 @@ function Cadastro() {
   const location = useLocation();
   const { usuario: usuarioLogado, handleLogout } = useContext(AuthContext);
 
-  
   const isEdicao = location.pathname === "/editarPerfil";
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -30,19 +28,18 @@ function Cadastro() {
     password: "",
   });
 
-  
   useEffect(() => {
     if (isEdicao) {
       const storage = JSON.parse(localStorage.getItem('usuarioToken') || '{}');
       const idParaUso = usuarioLogado.id !== 0 ? usuarioLogado.id : storage.id;
-      
+
       if (idParaUso) {
         setUsuario({
           id: idParaUso,
           name: usuarioLogado.name || storage.name || "",
           username: usuarioLogado.username || storage.username || "",
           email: usuarioLogado.email || storage.email || "",
-          password: "", 
+          password: "",
         });
       }
     } else {
@@ -54,11 +51,10 @@ function Cadastro() {
     setUsuario({ ...usuario, [e.target.name]: e.target.value });
   }
 
- 
   async function processarFormulario(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
-    
+
     const storage = JSON.parse(localStorage.getItem('usuarioToken') || '{}');
     const tokenRaw = usuarioLogado.token || storage.token;
     const tokenFormatado = tokenRaw?.startsWith('Bearer ') ? tokenRaw : `Bearer ${tokenRaw}`;
@@ -92,7 +88,6 @@ function Cadastro() {
     }
   }
 
-  
   const handleDelete = async () => {
     const storage = JSON.parse(localStorage.getItem('usuarioToken') || '{}');
     const idParaDeletar = usuario.id || storage.id;
@@ -118,14 +113,12 @@ function Cadastro() {
 
   return (
     <>
-      {isEdicao && <Navbar />}
-
       <div className={`grid grid-cols-1 lg:grid-cols-2 ${isEdicao ? 'min-h-[80vh]' : 'h-screen'} place-items-center font-bold`}>
-        
+
         {!isEdicao && (
           <div className="bg-[url('https://i.imgur.com/ZZFAmzo.jpg')] lg:block hidden bg-no-repeat w-full min-h-screen bg-cover bg-center"></div>
         )}
-        
+
         <form onSubmit={processarFormulario} className={`flex justify-center items-center flex-col gap-3 p-8 ${isEdicao ? 'w-full max-w-md' : 'w-2/3'}`}>
           <h2 className="text-indigo-900 text-5xl mb-4 text-center">
             {isEdicao ? "Editar Perfil" : "Cadastrar"}
@@ -159,14 +152,13 @@ function Cadastro() {
             </>
           )}
 
-         
           <div className="flex flex-row gap-2 w-full mt-4">
             <button type="submit" disabled={isLoading} className="flex-1 rounded text-white bg-indigo-900 hover:bg-indigo-950 py-2 flex justify-center items-center disabled:bg-indigo-300 transition shadow-md">
               {isLoading ? <ClipLoader color="#ffffff" size={24} /> : <span>{isEdicao ? "Salvar" : "Cadastrar"}</span>}
             </button>
 
-            <button 
-                type="button" 
+            <button
+                type="button"
                 onClick={() => navigate(isEdicao ? "/cadastro" : "/editarPerfil")}
                 className="flex-1 rounded text-white bg-teal-600 hover:bg-teal-700 py-2 font-bold transition shadow-md"
             >
@@ -176,16 +168,16 @@ function Cadastro() {
 
           {isEdicao && (
             <div className="flex flex-col w-full gap-2">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => navigate("/home")}
                 className="rounded text-white bg-slate-500 hover:bg-slate-600 w-full py-2 font-bold transition shadow-md"
               >
                 Voltar para Home
               </button>
 
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={handleDelete}
                 disabled={isLoading}
                 className="rounded text-white bg-red-600 hover:bg-red-800 w-full py-2 font-bold mt-2 disabled:bg-red-300 transition shadow-md"

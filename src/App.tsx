@@ -1,46 +1,100 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 import Home from "./pages/home/Home";
 import Cadastro from "./pages/cadastro/Cadastro";
-import Footer from "./components/footer/Footer"; 
-import Login from './pages/login/Login';
-import { AuthProvider } from './contexts/AuthContext';
-import Navbar from './components/navbar/Navbar';
-import Tarefas from './pages/tarefas/Tarefas'; 
+import Footer from "./components/footer/Footer";
+import Login from "./pages/login/Login";
+import { AuthProvider } from "./contexts/AuthProvider";
+import Navbar from "./components/navbar/Navbar";
+import Tarefas from "./pages/tarefas/Tarefas";
+import RotaProtegida from "./components/rotaProtegida/RotaProtegida";
 
 function App() {
-  return (
-    <>
-      <AuthProvider>
-        <BrowserRouter>
-          <Navbar />
-          <div className='min-h-[80vh]'> 
-            <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/cadastro" element={<Cadastro />} />
+    return (
+        <AuthProvider>
+            <BrowserRouter>
 
-              
-              <Route path="/home" element={<Home />} />
+                <Navbar />
 
-              
-              <Route path="/editarPerfil" element={<Cadastro />} />
+                <div className="min-h-[80vh]">
 
-              
-              <Route path="/tarefas" element={<Tarefas />} />
-              
-              
-              <Route path="/gerenciarTarefas" element={<Tarefas />} />
-              
-              
-              <Route path="/editarTarefa/:id" element={<Tarefas />} />
-              
-            </Routes>
-          </div>
-          <Footer />
-        </BrowserRouter>
-      </AuthProvider>  
-    </>  
-  );
+                    <Routes>
+
+                        {/* Rotas públicas */}
+                        <Route
+                            path="/"
+                            element={<Login />}
+                        />
+
+                        <Route
+                            path="/login"
+                            element={<Login />}
+                        />
+
+                        <Route
+                            path="/cadastro"
+                            element={<Cadastro />}
+                        />
+
+                        {/* Home após o login */}
+                        <Route
+                            path="/home"
+                            element={
+                                <RotaProtegida>
+                                    <Home />
+                                </RotaProtegida>
+                            }
+                        />
+
+                        {/* Gerenciar usuário */}
+                        <Route
+                            path="/editarPerfil"
+                            element={
+                                <RotaProtegida>
+                                    <Cadastro />
+                                </RotaProtegida>
+                            }
+                        />
+
+                        {/* Cadastrar tarefa */}
+                        <Route
+                            path="/tarefas"
+                            element={
+                                <RotaProtegida>
+                                    <Tarefas />
+                                </RotaProtegida>
+                            }
+                        />
+
+                        {/* Gerenciar tarefas */}
+                        <Route
+                            path="/gerenciarTarefas"
+                            element={
+                                <RotaProtegida>
+                                    <Tarefas />
+                                </RotaProtegida>
+                            }
+                        />
+
+                        {/* Editar tarefa */}
+                        <Route
+                            path="/editarTarefa/:id"
+                            element={
+                                <RotaProtegida>
+                                    <Tarefas />
+                                </RotaProtegida>
+                            }
+                        />
+
+                    </Routes>
+
+                </div>
+
+                <Footer />
+
+            </BrowserRouter>
+        </AuthProvider>
+    );
 }
 
 export default App;
