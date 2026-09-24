@@ -23,6 +23,7 @@ interface Tarefa {
     id?: number;
     titulo: string;
     descricao: string;
+    status?: boolean;
 }
 
 function Tarefas() {
@@ -64,6 +65,7 @@ function Tarefas() {
                             "Formato inesperado da lista de tarefas:",
                             dados
                         );
+
                         setListaTarefas([]);
                     }
                 },
@@ -78,17 +80,22 @@ function Tarefas() {
 
     useEffect(() => {
         if (isEdicao && token !== "") {
-            buscar(`/tasks/${id}`, (dados: Tarefa) => {
-                setTarefa({
-                    titulo: dados.titulo ?? "",
-                    descricao: dados.descricao ?? "",
-                    id: dados.id,
-                });
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
+            buscar(
+                `/tasks/${id}`,
+                (dados: Tarefa) => {
+                    setTarefa({
+                        titulo: dados.titulo ?? "",
+                        descricao: dados.descricao ?? "",
+                        id: dados.id,
+                        status: dados.status ?? false,
+                    });
                 },
-            });
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
         }
     }, [id, token, isEdicao]);
 
@@ -157,6 +164,42 @@ function Tarefas() {
         }
     }
 
+    async function alterarStatus(tarefaSelecionada: Tarefa) {
+        if (!tarefaSelecionada.id) return;
+
+        try {
+            const novoStatus = !tarefaSelecionada.status;
+
+            await atualizar(
+                `/tasks/${tarefaSelecionada.id}`,
+                {
+                    titulo: tarefaSelecionada.titulo,
+                    descricao: tarefaSelecionada.descricao,
+                    status: novoStatus,
+                },
+                () => {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setListaTarefas(
+                listaTarefas.map((t) =>
+                    t.id === tarefaSelecionada.id
+                        ? { ...t, status: novoStatus }
+                        : t
+                )
+            );
+        } catch (error) {
+            console.error("Erro ao alterar status:", error);
+
+            alert("Erro ao alterar o status da tarefa.");
+        }
+    }
+
     async function excluirTarefa(idTarefa: number) {
         if (window.confirm("Tem certeza que deseja excluir esta tarefa?")) {
             try {
@@ -211,25 +254,70 @@ function Tarefas() {
                             <div className="flex flex-col gap-3 h-[50vh] overflow-y-auto pr-2">
 
                                 {listaTarefas.length === 0 ? (
+
                                     <p className="text-center text-slate-500 font-normal">
                                         Nenhuma tarefa cadastrada.
                                     </p>
+
                                 ) : (
+
                                     listaTarefas.map((t) => (
+
                                         <div
                                             key={t.id}
-                                            className="border-2 border-slate-700 p-4 rounded bg-white shadow-sm flex flex-col gap-2"
+                                            className={`border-2 p-4 rounded bg-white shadow-sm flex flex-col gap-2 ${
+                                                t.status
+                                                    ? "border-green-500"
+                                                    : "border-slate-700"
+                                            }`}
                                         >
 
-                                            <h3 className="text-indigo-900 text-xl">
-                                                {t.titulo}
-                                            </h3>
+                                            <div className="flex items-center justify-between gap-2">
 
-                                            <p className="font-normal text-slate-600 text-sm mb-3">
+                                                <h3
+                                                    className={`text-xl ${
+                                                        t.status
+                                                            ? "text-slate-400 line-through"
+                                                            : "text-indigo-900"
+                                                    }`}
+                                                >
+                                                    {t.titulo}
+                                                </h3>
+
+                                                {t.status && (
+                                                    <span className="text-green-600 text-sm font-bold">
+                                                        Concluída
+                                                    </span>
+                                                )}
+
+                                            </div>
+
+                                            <p
+                                                className={`font-normal text-sm mb-3 ${
+                                                    t.status
+                                                        ? "text-slate-400 line-through"
+                                                        : "text-slate-600"
+                                                }`}
+                                            >
                                                 {t.descricao}
                                             </p>
 
                                             <div className="flex gap-2">
+
+                                                <button
+                                                    onClick={() =>
+                                                        alterarStatus(t)
+                                                    }
+                                                    className={`flex-1 text-white rounded py-1 text-sm transition font-bold ${
+                                                        t.status
+                                                            ? "bg-orange-500 hover:bg-orange-600"
+                                                            : "bg-green-600 hover:bg-green-700"
+                                                    }`}
+                                                >
+                                                    {t.status
+                                                        ? "Reabrir"
+                                                        : "Concluir"}
+                                                </button>
 
                                                 <button
                                                     onClick={() =>
@@ -255,7 +343,9 @@ function Tarefas() {
                                             </div>
 
                                         </div>
+
                                     ))
+
                                 )}
 
                             </div>

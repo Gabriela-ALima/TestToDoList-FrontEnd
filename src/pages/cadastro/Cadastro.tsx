@@ -62,9 +62,21 @@ function Cadastro() {
     try {
       if (isEdicao) {
         const idParaEnvio = usuario.id || storage.id;
-        await atualizar(`/usuarios/${idParaEnvio}`, usuario, setUsuario, {
-          headers: { Authorization: tokenFormatado },
-        });
+
+const dadosAtualizacao = {
+    name: usuario.name,
+    username: usuario.username,
+    email: usuario.email,
+};
+
+await atualizar(
+    `/usuarios/${idParaEnvio}`,
+    dadosAtualizacao,
+    setUsuario,
+    {
+        headers: { Authorization: tokenFormatado },
+    }
+);
         alert("Perfil atualizado com sucesso!");
         navigate("/home");
       } else {
