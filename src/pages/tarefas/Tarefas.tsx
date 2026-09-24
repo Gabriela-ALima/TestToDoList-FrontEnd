@@ -39,13 +39,7 @@ function Tarefas() {
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const [listaTarefas, setListaTarefas] = useState<Tarefa[]>([
-        {
-            id: 999,
-            titulo: "Tarefa de Exemplo",
-            descricao: "Cadastre uma tarefa real para substituir esta.",
-        },
-    ]);
+    const [listaTarefas, setListaTarefas] = useState<Tarefa[]>([]);
 
     const [tarefa, setTarefa] = useState<Tarefa>({
         titulo: "",
@@ -54,23 +48,49 @@ function Tarefas() {
 
     useEffect(() => {
         if (isGerenciar && token !== "") {
-            buscar("/tasks/", setListaTarefas, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
+            buscar(
+                "/tasks/",
+                (dados: any) => {
+                    console.log("RESPOSTA DAS TAREFAS:", dados);
+
+                    if (Array.isArray(dados)) {
+                        setListaTarefas(dados);
+                    } else if (Array.isArray(dados.tasks)) {
+                        setListaTarefas(dados.tasks);
+                    } else if (Array.isArray(dados.data)) {
+                        setListaTarefas(dados.data);
+                    } else {
+                        console.error(
+                            "Formato inesperado da lista de tarefas:",
+                            dados
+                        );
+                        setListaTarefas([]);
+                    }
                 },
-            });
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
         }
     }, [isGerenciar, token]);
 
     useEffect(() => {
         if (isEdicao && token !== "") {
-            buscar(`/tasks/${id}`, setTarefa, {
+            buscar(`/tasks/${id}`, (dados: Tarefa) => {
+                setTarefa({
+                    titulo: dados.titulo ?? "",
+                    descricao: dados.descricao ?? "",
+                    id: dados.id,
+                });
+            }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
         }
-    }, [id, token]);
+    }, [id, token, isEdicao]);
 
     function atualizarEstado(
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -165,8 +185,7 @@ function Tarefas() {
 
                 <div
                     className="bg-[url('https://i.imgur.com/ZZFAmzo.jpg')] lg:block hidden bg-no-repeat w-full h-full bg-cover bg-center"
-                >
-                </div>
+                />
 
                 <div className="flex flex-col justify-center items-center w-full p-8">
 
@@ -191,49 +210,53 @@ function Tarefas() {
 
                             <div className="flex flex-col gap-3 h-[50vh] overflow-y-auto pr-2">
 
-                                {listaTarefas.map((t) => (
+                                {listaTarefas.length === 0 ? (
+                                    <p className="text-center text-slate-500 font-normal">
+                                        Nenhuma tarefa cadastrada.
+                                    </p>
+                                ) : (
+                                    listaTarefas.map((t) => (
+                                        <div
+                                            key={t.id}
+                                            className="border-2 border-slate-700 p-4 rounded bg-white shadow-sm flex flex-col gap-2"
+                                        >
 
-                                    <div
-                                        key={t.id}
-                                        className="border-2 border-slate-700 p-4 rounded bg-white shadow-sm flex flex-col gap-2"
-                                    >
+                                            <h3 className="text-indigo-900 text-xl">
+                                                {t.titulo}
+                                            </h3>
 
-                                        <h3 className="text-indigo-900 text-xl">
-                                            {t.titulo}
-                                        </h3>
+                                            <p className="font-normal text-slate-600 text-sm mb-3">
+                                                {t.descricao}
+                                            </p>
 
-                                        <p className="font-normal text-slate-600 text-sm mb-3">
-                                            {t.descricao}
-                                        </p>
+                                            <div className="flex gap-2">
 
-                                        <div className="flex gap-2">
+                                                <button
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/editarTarefa/${t.id}`
+                                                        )
+                                                    }
+                                                    className="flex-1 bg-teal-600 text-white rounded py-1 text-sm hover:bg-teal-700 transition font-bold"
+                                                >
+                                                    Editar
+                                                </button>
 
-                                            <button
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/editarTarefa/${t.id}`
-                                                    )
-                                                }
-                                                className="flex-1 bg-teal-600 text-white rounded py-1 text-sm hover:bg-teal-700 transition font-bold"
-                                            >
-                                                Editar
-                                            </button>
+                                                <button
+                                                    onClick={() =>
+                                                        t.id &&
+                                                        excluirTarefa(t.id)
+                                                    }
+                                                    className="flex-1 bg-red-600 text-white rounded py-1 text-sm hover:bg-red-700 transition font-bold"
+                                                >
+                                                    Excluir
+                                                </button>
 
-                                            <button
-                                                onClick={() =>
-                                                    t.id &&
-                                                    excluirTarefa(t.id)
-                                                }
-                                                className="flex-1 bg-red-600 text-white rounded py-1 text-sm hover:bg-red-700 transition font-bold"
-                                            >
-                                                Excluir
-                                            </button>
+                                            </div>
 
                                         </div>
-
-                                    </div>
-
-                                ))}
+                                    ))
+                                )}
 
                             </div>
 
@@ -262,7 +285,7 @@ function Tarefas() {
                                 <input
                                     type="text"
                                     name="titulo"
-                                    value={tarefa.titulo}
+                                    value={tarefa.titulo ?? ""}
                                     onChange={atualizarEstado}
                                     className="border-2 border-slate-700 rounded p-2 focus:border-indigo-900 outline-none"
                                     required
@@ -278,7 +301,7 @@ function Tarefas() {
 
                                 <textarea
                                     name="descricao"
-                                    value={tarefa.descricao}
+                                    value={tarefa.descricao ?? ""}
                                     onChange={atualizarEstado}
                                     className="border-2 border-slate-700 rounded p-2 h-32 font-normal focus:border-indigo-900 outline-none"
                                     required
