@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import {
     buscar,
@@ -51,7 +52,7 @@ function Tarefas() {
         if (isGerenciar && token !== "") {
             buscar(
                 "/tasks/",
-                (dados: any) => {
+                (dados: Tarefa[] | { tasks?: Tarefa[]; data?: Tarefa[] }) => {
                     console.log("RESPOSTA DAS TAREFAS:", dados);
 
                     if (Array.isArray(dados)) {
@@ -126,7 +127,7 @@ function Tarefas() {
                     }
                 );
 
-                alert("Tarefa atualizada com sucesso!");
+                toast.success("Tarefa atualizada com sucesso!");
 
                 navigate("/gerenciarTarefas");
             } else {
@@ -149,14 +150,22 @@ function Tarefas() {
                     }
                 );
 
-                alert("Tarefa criada com sucesso!");
+                toast.success("Tarefa criada com sucesso!");
 
                 navigate("/gerenciarTarefas");
             }
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Erro na requisição:", error);
 
-            alert(
+            let mensagemBackend: string | undefined;
+
+            if (error && typeof error === 'object' && 'response' in error) {
+                const err = error as { response?: { data?: { message?: string } } };
+                mensagemBackend = err.response?.data?.message;
+            }
+
+            toast.error(
+                mensagemBackend ||
                 "Erro ao processar. Verifique se o servidor está rodando e tente novamente."
             );
         } finally {
@@ -193,10 +202,17 @@ function Tarefas() {
                         : t
                 )
             );
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Erro ao alterar status:", error);
 
-            alert("Erro ao alterar o status da tarefa.");
+            let mensagemBackend: string | undefined;
+
+            if (error && typeof error === 'object' && 'response' in error) {
+                const err = error as { response?: { data?: { message?: string } } };
+                mensagemBackend = err.response?.data?.message;
+            }
+
+            toast.error(mensagemBackend || "Erro ao alterar o status da tarefa.");
         }
     }
 
@@ -213,11 +229,18 @@ function Tarefas() {
                     listaTarefas.filter((t) => t.id !== idTarefa)
                 );
 
-                alert("Tarefa removida com sucesso!");
-            } catch (error) {
+                toast.success("Tarefa removida com sucesso!");
+            } catch (error: unknown) {
                 console.error("Erro ao excluir tarefa:", error);
 
-                alert("Erro ao excluir tarefa. Verifique sua conexão.");
+                let mensagemBackend: string | undefined;
+
+                if (error && typeof error === 'object' && 'response' in error) {
+                    const err = error as { response?: { data?: { message?: string } } };
+                    mensagemBackend = err.response?.data?.message;
+                }
+
+                toast.error(mensagemBackend || "Erro ao excluir tarefa. Verifique sua conexão.");
             }
         }
     }

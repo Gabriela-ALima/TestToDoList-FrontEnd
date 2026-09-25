@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { toast } from "react-toastify";
 import type LoginUsuario from "../models/LoginUsuario";
 import { login } from "../services/Service";
 import { AuthContext } from "./AuthContext";
@@ -34,22 +35,43 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(true);
 
     try {
-      await login(`/usuarios/logar/`, loginUsuario, (resposta: any) => {
+      await login(`/usuarios/logar/`, loginUsuario, (resposta: LoginUsuario) => {
         setUsuario(resposta);
 
-        const { password, ...dadosSeguros } = resposta;
+        const dadosSeguros = {
+          id: resposta.id,
+          name: resposta.name,
+          username: resposta.username,
+          email: resposta.email,
+          token: resposta.token,
+        };
         localStorage.setItem('usuarioToken', JSON.stringify(dadosSeguros));
       });
 
-      alert("Login feito com sucesso!");
+      toast.success("Login feito com sucesso!");
     } catch (error: unknown) {
       console.error("Erro no login:", error);
 
       if (error && typeof error === 'object' && 'response' in error) {
-        const err = error as { response: { status: number } };
-        alert(`Erro ${err.response.status}: Dados de acesso inválidos.`);
+        const err = error as {
+          response: {
+            status: number;
+            data?: { message?: string };
+          };
+        };
+        const mensagemBackend = err.response.data?.message;
+
+        if (err.response.status === 404) {
+          toast.error(mensagemBackend || "Usuário não encontrado.");
+        } else if (err.response.status === 401) {
+          toast.error(mensagemBackend || "Senha incorreta.");
+        } else if (err.response.status === 400) {
+          toast.error(mensagemBackend || "Preencha usuário e senha.");
+        } else {
+          toast.error(mensagemBackend || "Erro ao fazer login. Tente novamente.");
+        }
       } else {
-        alert("Erro de conexão. Verifique se o backend está online.");
+        toast.error("Erro de conexão. Verifique se o backend está online.");
       }
     } finally {
       setIsLoading(false);

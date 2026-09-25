@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import { cadastrarUsuario, atualizar, deletar } from "../../services/Service";
 import { AuthContext } from "../../contexts/AuthContext";
 import { ClipLoader } from "react-spinners";
@@ -60,43 +61,54 @@ function Cadastro() {
     const tokenFormatado = tokenRaw?.startsWith('Bearer ') ? tokenRaw : `Bearer ${tokenRaw}`;
 
     try {
-      if (isEdicao) {
-        const idParaEnvio = usuario.id || storage.id;
+        if (isEdicao) {
+            const idParaEnvio = usuario.id || storage.id;
 
-const dadosAtualizacao = {
-    name: usuario.name,
-    username: usuario.username,
-    email: usuario.email,
-};
+            const dadosAtualizacao = {
+                name: usuario.name,
+                username: usuario.username,
+                email: usuario.email,
+            };
 
-await atualizar(
-    `/usuarios/${idParaEnvio}`,
-    dadosAtualizacao,
-    setUsuario,
-    {
-        headers: { Authorization: tokenFormatado },
-    }
-);
-        alert("Perfil atualizado com sucesso!");
-        navigate("/home");
-      } else {
-        if (confirmarSenha === usuario.password && (usuario.password?.length ?? 0) >= 8) {
-          await cadastrarUsuario(`/usuarios/`, usuario, setUsuario);
-          alert("Usuário cadastrado com sucesso!");
-          navigate("/tarefas");
+            await atualizar(
+                `/usuarios/${idParaEnvio}`,
+                dadosAtualizacao,
+                setUsuario,
+                {
+                    headers: { Authorization: tokenFormatado },
+                }
+            );
+            toast.success("Perfil atualizado com sucesso!");
+            navigate("/home");
         } else {
-          alert("As senhas não conferem ou são menores que 8 caracteres.");
+            if (confirmarSenha === usuario.password && (usuario.password?.length ?? 0) >= 8) {
+                await cadastrarUsuario(`/usuarios/`, usuario, setUsuario);
+                toast.success("Usuário cadastrado com sucesso!");
+                navigate("/tarefas");
+            } else {
+                toast.error("As senhas não conferem ou são menores que 8 caracteres.");
+            }
         }
-      }
-    } catch (error: any) {
-        const erroBackend = error.response?.data?.error || "";
-        if (erroBackend.includes("UniqueViolation")) {
-            alert("Erro: Username ou E-mail já em uso.");
+    } catch (error: unknown) {
+        let erroBackend = "";
+
+        if (error && typeof error === 'object' && 'response' in error) {
+            const err = error as { response?: { data?: { error?: string } } };
+            erroBackend = err.response?.data?.error || "";
+        }
+
+        const erroBackendLower = erroBackend.toLowerCase();
+
+        if (
+            erroBackendLower.includes("unique") ||
+            erroBackendLower.includes("duplicate")
+        ) {
+            toast.error("Username ou e-mail já cadastrado. Tente outro.");
         } else {
-            alert("Erro na operação. Verifique o servidor no Render.");
+            toast.error("Erro na operação. Verifique o servidor no Render.");
         }
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   }
 
@@ -112,11 +124,20 @@ await atualizar(
         await deletar(`/usuarios/${idParaDeletar}`, {
           headers: { Authorization: tokenFormatado },
         });
-        alert("Sua conta foi removida.");
+        toast.success("Sua conta foi removida.");
         handleLogout();
         navigate("/login");
-      } catch (error) {
-        alert("Erro ao excluir conta. Verifique se há tarefas pendentes.");
+      } catch (error: unknown) {
+        console.error("Erro ao excluir conta:", error);
+
+        let mensagemBackend: string | undefined;
+
+        if (error && typeof error === 'object' && 'response' in error) {
+          const err = error as { response?: { data?: { message?: string } } };
+          mensagemBackend = err.response?.data?.message;
+        }
+
+        toast.error(mensagemBackend || "Erro ao excluir conta. Verifique se há tarefas pendentes.");
       } finally {
         setIsLoading(false);
       }

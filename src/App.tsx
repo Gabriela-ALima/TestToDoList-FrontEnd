@@ -1,100 +1,53 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Home from "./pages/home/Home";
 import Cadastro from "./pages/cadastro/Cadastro";
 import Footer from "./components/footer/Footer";
-import Login from "./pages/login/Login";
-import { AuthProvider } from "./contexts/AuthProvider";
-import Navbar from "./components/navbar/Navbar";
-import Tarefas from "./pages/tarefas/Tarefas";
-import RotaProtegida from "./components/rotaProtegida/RotaProtegida";
+import Login from './pages/login/Login';
+import { AuthProvider } from './contexts/AuthProvider';
+import Navbar from './components/navbar/Navbar';
+import Tarefas from './pages/tarefas/Tarefas';
+import RotaProtegida from './components/rotaProtegida/RotaProtegida';
 
 function App() {
-    return (
-        <AuthProvider>
-            <BrowserRouter>
+  return (
+    <>
+      <AuthProvider>
+        <BrowserRouter>
+          <Navbar />
+          <div className='min-h-[80vh]'>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/cadastro" element={<Cadastro />} />
 
-                <Navbar />
+              <Route path="/home" element={<RotaProtegida><Home /></RotaProtegida>} />
 
-                <div className="min-h-[80vh]">
+              <Route path="/editarPerfil" element={<RotaProtegida><Cadastro /></RotaProtegida>} />
 
-                    <Routes>
+              <Route path="/tarefas" element={<RotaProtegida><Tarefas /></RotaProtegida>} />
 
-                        {/* Rotas públicas */}
-                        <Route
-                            path="/"
-                            element={<Login />}
-                        />
+              <Route path="/gerenciarTarefas" element={<RotaProtegida><Tarefas /></RotaProtegida>} />
 
-                        <Route
-                            path="/login"
-                            element={<Login />}
-                        />
+              <Route path="/editarTarefa/:id" element={<RotaProtegida><Tarefas /></RotaProtegida>} />
 
-                        <Route
-                            path="/cadastro"
-                            element={<Cadastro />}
-                        />
+            </Routes>
+          </div>
+          <Footer />
+        </BrowserRouter>
+      </AuthProvider>
 
-                        {/* Home após o login */}
-                        <Route
-                            path="/home"
-                            element={
-                                <RotaProtegida>
-                                    <Home />
-                                </RotaProtegida>
-                            }
-                        />
-
-                        {/* Gerenciar usuário */}
-                        <Route
-                            path="/editarPerfil"
-                            element={
-                                <RotaProtegida>
-                                    <Cadastro />
-                                </RotaProtegida>
-                            }
-                        />
-
-                        {/* Cadastrar tarefa */}
-                        <Route
-                            path="/tarefas"
-                            element={
-                                <RotaProtegida>
-                                    <Tarefas />
-                                </RotaProtegida>
-                            }
-                        />
-
-                        {/* Gerenciar tarefas */}
-                        <Route
-                            path="/gerenciarTarefas"
-                            element={
-                                <RotaProtegida>
-                                    <Tarefas />
-                                </RotaProtegida>
-                            }
-                        />
-
-                        {/* Editar tarefa */}
-                        <Route
-                            path="/editarTarefa/:id"
-                            element={
-                                <RotaProtegida>
-                                    <Tarefas />
-                                </RotaProtegida>
-                            }
-                        />
-
-                    </Routes>
-
-                </div>
-
-                <Footer />
-
-            </BrowserRouter>
-        </AuthProvider>
-    );
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        theme="colored"
+      />
+    </>
+  );
 }
 
 export default App;
